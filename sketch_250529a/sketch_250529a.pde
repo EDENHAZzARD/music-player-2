@@ -1,4 +1,5 @@
-int[] board = new int[9]; // 0 = empty, 1 = X, -1 = O
+// Game variables
+int[] board = new int[9]; // 1D array for the board (0 = empty, 1 = X, -1 = O)
 int currentPlayer = 1; // 1 for X, -1 for O
 boolean gameOver = false;
 boolean vsAI = false; // Toggle AI mode
@@ -10,22 +11,23 @@ int scoreO = 0;
 int scoreTies = 0;
 
 void setup() {
-  size(500, 600); // Increased height for buttons and scoreboard
-  textAlign(CENTER, CENTER);
-  textSize(32);
+  size(500, 600); // Window size
+  textAlign(CENTER, CENTER); // Center text alignment
+  textSize(32); // Default text size
 }
 
 void draw() {
   background(220, 240, 255); // Light blue background
-  drawScoreboard();
-  drawBoard();
-  drawButtons();
+  drawScoreboard(); // Draw the scoreboard
+  drawBoard(); // Draw the game board
+  drawButtons(); // Draw the buttons
   if (gameOver) {
     fill(0);
-    text(winnerMessage, width / 2, height - 150); // Display winner message
+    text(winnerMessage, width / 2, height - 150); // Show winner message
   }
 }
 
+// Draw the scoreboard at the top
 void drawScoreboard() {
   fill(0);
   textSize(24);
@@ -34,42 +36,46 @@ void drawScoreboard() {
   text("Ties: " + scoreTies, 3 * width / 4, 40);
 }
 
+// Draw the Tic Tac Toe board
 void drawBoard() {
   stroke(50);
   strokeWeight(4);
 
-  // Draw grid
+  // Draw grid lines
   for (int i = 1; i < 3; i++) {
     line(i * 150, 100, i * 150, 550); // Vertical lines
     line(0, 100 + i * 150, 450, 100 + i * 150); // Horizontal lines
   }
 
-  // Draw X and O
+  // Draw X and O based on the board array
   for (int i = 0; i < 9; i++) {
-    int x = (i % 3) * 150 + 75;
-    int y = (i / 3) * 150 + 175;
+    int x = (i % 3) * 150 + 75; // Calculate x position
+    int y = (i / 3) * 150 + 175; // Calculate y position
     if (board[i] == 1) {
-      drawX(x, y);
+      drawX(x, y); // Draw X
     } else if (board[i] == -1) {
-      drawO(x, y);
+      drawO(x, y); // Draw O
     }
   }
 }
 
+// Draw an X at the given position
 void drawX(int x, int y) {
-  stroke(0, 102, 204); // Blue for X
+  stroke(0, 102, 204); // Blue color for X
   strokeWeight(6);
-  line(x - 40, y - 40, x + 40, y + 40);
-  line(x + 40, y - 40, x - 40, y + 40);
+  line(x - 40, y - 40, x + 40, y + 40); // First line of X
+  line(x + 40, y - 40, x - 40, y + 40); // Second line of X
 }
 
+// Draw an O at the given position
 void drawO(int x, int y) {
-  stroke(255, 102, 102); // Pink for O
+  stroke(255, 102, 102); // Pink color for O
   strokeWeight(6);
   noFill();
-  ellipse(x, y, 80, 80);
+  ellipse(x, y, 80, 80); // Draw circle
 }
 
+// Draw the Restart and AI Toggle buttons
 void drawButtons() {
   // Restart Button
   fill(100, 200, 100); // Green button
@@ -86,30 +92,31 @@ void drawButtons() {
   text(vsAI ? "AI: ON" : "AI: OFF", 375, height - 55);
 }
 
+// Handle mouse clicks
 void mousePressed() {
-  // Restart Button
+  // Check if Restart Button is clicked
   if (mouseX > 50 && mouseX < 200 && mouseY > height - 80 && mouseY < height - 30) {
-    resetGame();
+    resetGame(); // Reset the game
     return;
   }
 
-  // AI Toggle Button
+  // Check if AI Toggle Button is clicked
   if (mouseX > 300 && mouseX < 450 && mouseY > height - 80 && mouseY < height - 30) {
-    vsAI = !vsAI;
+    vsAI = !vsAI; // Toggle AI mode
     resetGame();
     return;
   }
 
-  if (gameOver) return;
+  if (gameOver) return; // Ignore clicks if the game is over
 
   // Handle player moves
-  int col = mouseX / 150;
-  int row = (mouseY - 100) / 150;
-  int index = row * 3 + col;
+  int col = mouseX / 150; // Calculate column
+  int row = (mouseY - 100) / 150; // Calculate row
+  int index = row * 3 + col; // Convert row and column to 1D index
 
-  if (index >= 0 && index < 9 && board[index] == 0) {
-    board[index] = currentPlayer;
-    if (checkWinner()) {
+  if (index >= 0 && index < 9 && board[index] == 0) { // Check if the cell is empty
+    board[index] = currentPlayer; // Place the current player's mark
+    if (checkWinner()) { // Check if the current player wins
       gameOver = true;
       if (currentPlayer == 1) {
         scoreX++;
@@ -118,39 +125,40 @@ void mousePressed() {
         scoreO++;
         winnerMessage = "Player O Wins!";
       }
-    } else if (isBoardFull()) {
+    } else if (isBoardFull()) { // Check if the board is full (tie)
       gameOver = true;
       scoreTies++;
       winnerMessage = "It's a Tie!";
     } else {
       currentPlayer *= -1; // Switch player
       if (vsAI && currentPlayer == -1) {
-        aiMove();
+        aiMove(); // AI makes a move
       }
     }
   }
 }
 
+// AI makes a move (simple AI: pick the first empty cell)
 void aiMove() {
-  // Simple AI: Pick the first available cell
   for (int i = 0; i < 9; i++) {
-    if (board[i] == 0) {
-      board[i] = -1;
-      if (checkWinner()) {
+    if (board[i] == 0) { // Find the first empty cell
+      board[i] = -1; // AI places O
+      if (checkWinner()) { // Check if AI wins
         gameOver = true;
         scoreO++;
         winnerMessage = "Player O Wins!";
-      } else if (isBoardFull()) {
+      } else if (isBoardFull()) { // Check if the board is full (tie)
         gameOver = true;
         scoreTies++;
         winnerMessage = "It's a Tie!";
       }
-      currentPlayer = 1; // Switch back to player
+      currentPlayer = 1; // Switch back to Player X
       return;
     }
   }
 }
 
+// Check if there is a winner
 boolean checkWinner() {
   // Winning combinations
   int[][] winCombos = {
@@ -161,19 +169,21 @@ boolean checkWinner() {
 
   for (int[] combo : winCombos) {
     if (board[combo[0]] == board[combo[1]] && board[combo[1]] == board[combo[2]] && board[combo[0]] != 0) {
-      return true;
+      return true; // A winning combination is found
     }
   }
-  return false;
+  return false; // No winner
 }
 
+// Check if the board is full
 boolean isBoardFull() {
   for (int i = 0; i < 9; i++) {
-    if (board[i] == 0) return false;
+    if (board[i] == 0) return false; // If any cell is empty, the board is not full
   }
-  return true;
+  return true; // All cells are filled
 }
 
+// Reset the game
 void resetGame() {
   board = new int[9]; // Clear the board
   currentPlayer = 1; // Reset to Player X
