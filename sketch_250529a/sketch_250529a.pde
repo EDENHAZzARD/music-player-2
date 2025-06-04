@@ -146,11 +146,11 @@ void aiMove() {
       if (checkWinner()) { // Check if AI wins
         gameOver = true;
         scoreO++;
-        winnerMessage = "Player O Wins!";
+        winnerMessage = "Player X Wins!";
       } else if (isBoardFull()) { // Check if the board is full (tie)
         gameOver = true;
         scoreTies++;
-        winnerMessage = "It's a Tie!";
+        winnerMessage = "NO WINNER";
       }
       currentPlayer = 1; // Switch back to Player X
       return;
